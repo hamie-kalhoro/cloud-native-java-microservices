@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        ## Customer Service Route
+        - id: customer
+          uri: lb://customer
+          predicates:
+            - Path=/api/v1/customers
+        ## Fraud Service Route
+        - id: fraud
+          uri: lb://fraud
+          predicates:
+            - Path=/api/v1/fraud-check
+        ## Eureka Service Route
+        - id: eureka
+          uri: http://localhost:8761
+          predicates:
+            - Path=/eureka/web
+          filters:
+            - RewritePath=/eureka/web, /
+        ## Eureka Service Static Resources
+        - id: eureka
+          uri: http://localhost:8761
+          predicates:
+            - Path=/eureka/**
+          filters:
+            - RewritePath=/eureka/web, /
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+logging:
+  level:
+    org.springframework.cloud.gateway.route.RouteDefinitionLocator: INFO
+    org.springframework.cloud.gateway: TRACE
